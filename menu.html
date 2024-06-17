@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Remote Desktop Menu</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f0f0f0;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+    }
+    button {
+      width: 200px;
+      padding: 10px;
+      margin: 10px;
+      border: none;
+      background: #007BFF;
+      color: white;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    button:hover {
+      background: #0056b3;
+    }
+  </style>
+</head>
+<body>
+  <h2>Menu</h2>
+  <button id="sendFileButton">Send File</button>
+  <button id="sendMessageButton">Send Message</button>
+  <button id="connectButton">Connect to Remote Desktop</button>
+  <script>
+    const { ipcRenderer, remote } = require('electron');
+    const { dialog } = remote;
+
+    document.getElementById('sendFileButton').addEventListener('click', async () => {
+      const result = await dialog.showOpenDialog({
+        properties: ['openFile']
+      });
+      if (!result.canceled && result.filePaths.length > 0) {
+        ipcRenderer.send('send-file', result.filePaths[0]);
+      }
+    });
+
+    document.getElementById('sendMessageButton').addEventListener('click', () => {
+      const message = prompt('Enter your message:');
+      if (message) {
+        ipcRenderer.send('send-text-message', message);
+      }
+    });
+
+    document.getElementById('connectButton').addEventListener('click', () => {
+      ipcRenderer.send('connect-ws');
+    });
+  </script>
+</body>
+</html>
